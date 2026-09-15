@@ -1,6 +1,21 @@
-[package]
-name = "norns"
+[workspace]
+resolver = "3"
+members = [
+  "crates/norns-core",
+  "crates/norns-protocol",
+  "crates/norns-client",
+  "crates/norns-server",
+]
+
+[workspace.package]
 version = "0.1.0"
 edition = "2024"
+license-file = "LICENSE"
+repository = "https://github.com/YOUR_USERNAME/norns"
 
-[dependencies]
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = "warn"
+pedantic = "warn"

@@ -1,0 +1,11 @@
+[package]
+name = "norns-protocol"
+version.workspace = true
+edition.workspace = true
+license-file.workspace = true
+repository.workspace = true
+
+[dependencies]
+
+[lints]
+workspace = true
