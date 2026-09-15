@@ -1,3 +1,4 @@
+pub mod economy;
 pub mod gathering;
 pub mod item;
 pub mod progression;
