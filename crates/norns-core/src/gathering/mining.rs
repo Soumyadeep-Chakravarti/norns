@@ -1,5 +1,5 @@
 use crate::{
-    item::Resource,
+    item::{ItemKind, ItemStack, Resource},
     progression::{Experience, SkillLevel},
 };
 
@@ -41,21 +41,15 @@ impl MiningNode {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MiningOutcome {
-    resource: Resource,
-    quantity: u32,
+    stack: ItemStack,
     mining_xp: Experience,
     specialization_xp: Experience,
 }
 
 impl MiningOutcome {
     #[must_use]
-    pub const fn resource(self) -> Resource {
-        self.resource
-    }
-
-    #[must_use]
-    pub const fn quantity(self) -> u32 {
-        self.quantity
+    pub const fn stack(self) -> ItemStack {
+        self.stack
     }
 
     #[must_use]
@@ -100,9 +94,12 @@ pub const fn can_mine(node: MiningNode, mining_level: SkillLevel) -> bool {
 
 #[must_use]
 pub const fn mine(node: MiningNode) -> MiningOutcome {
+    let Some(stack) = ItemStack::new(ItemKind::Resource(node.resource), 1) else {
+        unreachable!()
+    };
+
     MiningOutcome {
-        resource: node.resource,
-        quantity: 1,
+        stack,
         mining_xp: node.xp_per_cycle,
         specialization_xp: node.specialization_xp_per_cycle,
     }
@@ -110,7 +107,7 @@ pub const fn mine(node: MiningNode) -> MiningOutcome {
 
 #[cfg(test)]
 mod tests {
-    use crate::item::Resource;
+    use crate::item::{ItemKind, Resource};
 
     use super::{COPPER, STONE, TIN, can_mine, mine};
 
@@ -128,9 +125,10 @@ mod tests {
     #[test]
     fn mining_produces_expected_outcome() {
         let outcome = mine(COPPER);
+        let stack = outcome.stack();
 
-        assert_eq!(outcome.resource(), Resource::CopperOre);
-        assert_eq!(outcome.quantity(), 1);
+        assert_eq!(stack.kind(), ItemKind::Resource(Resource::CopperOre));
+        assert_eq!(stack.quantity(), 1);
         assert_eq!(outcome.mining_xp(), COPPER.xp_per_cycle());
         assert_eq!(
             outcome.specialization_xp(),
