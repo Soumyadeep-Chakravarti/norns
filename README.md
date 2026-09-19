@@ -76,9 +76,14 @@ Both systems support progression beyond level 100.
 
 ## Quality
 
-Items use a long-tail quality system ranging from Standard to Primordial.
-Quality can be obtained through natural quality rolls or deterministically
-through the Forge.
+Quality-bearing item categories use a long-tail quality system ranging from
+Standard to Primordial. Quality can be obtained through natural quality rolls
+or deterministically through the Forge for eligible items.
+
+Raw gathered resources have no quality. Their `ItemStack` contains only item
+identity and a positive quantity; Mining produces these stacks alongside XP.
+The concrete model for quality-bearing equipment and crafted items will be
+defined when the first such category is implemented.
 
 See [Quality and Forging](docs/quality-and-forging.md).
 

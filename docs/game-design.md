@@ -63,7 +63,7 @@ dangerous regions, bosses, expeditions, and progression.
 resource sales, specialized crafting, trading, markets, crafting commissions,
 gifting, clans, and economic cooperation.
 
-Systems such as the Forge intentionally destroy resources and currency to
+Systems such as the Forge intentionally consume eligible items and currency to
 counter long-term inflation in an idle game.
 
 ## Multiplayer Philosophy
@@ -76,7 +76,8 @@ specialists and interacting with other specialists.
 
 **Current implementation:** Mining is the first gathering vertical slice, with
 Stone, Copper Ore, and Tin Ore. Mining grants broad mining XP and resource
-specialization XP.
+specialization XP alongside an `ItemStack` containing resource identity and a
+positive quantity. Raw resources have no quality, and Mining does not roll it.
 
 **Balance placeholder:** Node level requirements, cycle durations, and XP
 rewards are provisional.

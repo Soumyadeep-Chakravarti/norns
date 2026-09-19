@@ -1,5 +1,25 @@
 # Quality and Forging
 
+## Resource Quality
+
+**Locked design:** Raw gathered resources do not have item quality.
+
+Mining and other resource-gathering activities produce resource stacks with an
+item identity and quantity. Quality is reserved for item categories explicitly
+designed to support it.
+
+For example:
+
+```text
+Copper Ore x50
+```
+
+is a resource stack, not a `Standard Copper Ore` stack.
+
+**Current implementation:** `ItemStack` contains an `ItemKind` and a positive
+quantity. Mining returns a resource stack alongside mining and specialization
+XP, without a quality roll.
+
 ## Quality Ladder
 
 **Current implementation:** Norns has a 22-tier quality ladder.
@@ -58,14 +78,33 @@ and specialization level. This separation avoids an RNG dependency in the core.
 
 Higher specialization improves quality chances using diminishing growth.
 
+This rule applies to quality rolling for quality-bearing items, not to raw
+resource gathering. Forge upgrades do not use specialization or quality rolls.
+
 **Balance placeholder:** The current luck coefficient, including the `750`
 basis-point increment, requires simulation and balancing.
 
+## Forge Eligibility
+
+**Locked design:** The Forge is a separate economic system that operates only
+on eligible quality-bearing items, independently of gathering, crafting,
+specialization, and the quality-roll operation.
+
+Raw resources are not forgeable merely because they can be represented as an
+`ItemStack`.
+
+The concrete model for quality-bearing equipment and crafted items will be
+defined when the first such item category is implemented.
+
 ## Forge
 
-**Current implementation:** The Forge deterministically upgrades four items of
-the same quality to one item of the next quality, provided the player has the
-required gold.
+**Current implementation:** The core Forge calculation accepts a quality,
+available item count, and gold. It checks the count and fee, then reports the
+next quality and costs. It does not yet model item identity or enforce category
+eligibility.
+
+**Locked design:** Four identical eligible items of the same quality plus gold
+produce one of the same item at the next quality:
 
 ```text
 4 identical items
@@ -77,7 +116,7 @@ required gold.
 at the next quality
 ```
 
-Example:
+Illustrative future equipment example:
 
 ```text
 4 Rare Iron Swords
