@@ -1,6 +1,6 @@
 use crate::economy::Gold;
 
-use super::Quality;
+use super::{CraftedItemStack, Quality};
 
 pub const FORGE_ITEM_COST: u32 = 4;
 
@@ -10,7 +10,7 @@ const FORGE_COST_MULTIPLIER: u64 = 2;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ForgeOutcome {
     consumed_items: u32,
-    produced_quality: Quality,
+    produced: CraftedItemStack,
     gold_spent: Gold,
     gold_remaining: Gold,
 }
@@ -22,8 +22,8 @@ impl ForgeOutcome {
     }
 
     #[must_use]
-    pub const fn produced_quality(self) -> Quality {
-        self.produced_quality
+    pub const fn produced(self) -> CraftedItemStack {
+        self.produced
     }
 
     #[must_use]
@@ -61,7 +61,11 @@ pub const fn forge_cost(quality: Quality) -> Option<Gold> {
     Some(Gold::new(cost))
 }
 
-/// Forges four items of the same quality into one item of the next quality.
+/// Describes forging four identical crafted items into one at the next quality.
+///
+/// The input stack supplies a single item identity and quality. The activity
+/// layer applies the consumed count, produced stack, and gold cost to inventory;
+/// this operation does not mutate inventory or return leftover input items.
 ///
 /// # Errors
 ///
@@ -74,22 +78,21 @@ pub const fn forge_cost(quality: Quality) -> Option<Gold> {
 /// Returns [`ForgeError::InsufficientGold`] if the available gold is less
 /// than the required forge cost.
 pub const fn forge(
-    quality: Quality,
-    available_items: u32,
+    stack: CraftedItemStack,
     available_gold: Gold,
 ) -> Result<ForgeOutcome, ForgeError> {
-    let Some(produced_quality) = quality.next() else {
+    let Some(produced_quality) = stack.quality().next() else {
         return Err(ForgeError::FinalQuality);
     };
 
-    if available_items < FORGE_ITEM_COST {
+    if stack.quantity() < FORGE_ITEM_COST {
         return Err(ForgeError::InsufficientItems {
             required: FORGE_ITEM_COST,
-            available: available_items,
+            available: stack.quantity(),
         });
     }
 
-    let Some(cost) = forge_cost(quality) else {
+    let Some(cost) = forge_cost(stack.quality()) else {
         return Err(ForgeError::FinalQuality);
     };
 
@@ -100,9 +103,13 @@ pub const fn forge(
         });
     };
 
+    let Some(produced) = CraftedItemStack::new(stack.item(), produced_quality, 1) else {
+        unreachable!()
+    };
+
     Ok(ForgeOutcome {
         consumed_items: FORGE_ITEM_COST,
-        produced_quality,
+        produced,
         gold_spent: cost,
         gold_remaining,
     })
@@ -113,26 +120,36 @@ mod tests {
     use crate::economy::Gold;
 
     use super::{FORGE_ITEM_COST, ForgeError, forge, forge_cost};
-    use crate::item::Quality;
+    use crate::item::{CraftedItem, CraftedItemStack, Quality};
+
+    fn swords(quality: Quality, quantity: u32) -> CraftedItemStack {
+        CraftedItemStack::new(CraftedItem::IronSword, quality, quantity)
+            .expect("positive quantity should create a stack")
+    }
 
     #[test]
     fn forge_consumes_four_items() {
-        let outcome = forge(Quality::Standard, 4, Gold::new(100)).expect("forge should succeed");
+        let outcome =
+            forge(swords(Quality::Standard, 4), Gold::new(100)).expect("forge should succeed");
 
         assert_eq!(outcome.consumed_items(), FORGE_ITEM_COST);
     }
 
     #[test]
     fn forge_produces_next_quality() {
-        let outcome = forge(Quality::Rare, 4, Gold::new(1_000_000)).expect("forge should succeed");
+        let outcome =
+            forge(swords(Quality::Rare, 7), Gold::new(1_000_000)).expect("forge should succeed");
 
-        assert_eq!(outcome.produced_quality(), Quality::Epic);
+        assert_eq!(outcome.consumed_items(), 4);
+        assert_eq!(outcome.produced().item(), CraftedItem::IronSword);
+        assert_eq!(outcome.produced().quality(), Quality::Epic);
+        assert_eq!(outcome.produced().quantity(), 1);
     }
 
     #[test]
     fn forge_rejects_insufficient_items() {
         assert_eq!(
-            forge(Quality::Standard, 3, Gold::new(100)),
+            forge(swords(Quality::Standard, 3), Gold::new(100)),
             Err(ForgeError::InsufficientItems {
                 required: 4,
                 available: 3,
@@ -145,7 +162,7 @@ mod tests {
         let cost = forge_cost(Quality::Rare).expect("rare should be forgeable");
 
         assert_eq!(
-            forge(Quality::Rare, 4, Gold::ZERO),
+            forge(swords(Quality::Rare, 4), Gold::ZERO),
             Err(ForgeError::InsufficientGold {
                 required: cost,
                 available: Gold::ZERO,
@@ -158,7 +175,7 @@ mod tests {
         assert_eq!(forge_cost(Quality::Primordial), None);
 
         assert_eq!(
-            forge(Quality::Primordial, 4, Gold::new(u64::MAX)),
+            forge(swords(Quality::Primordial, 4), Gold::new(u64::MAX)),
             Err(ForgeError::FinalQuality)
         );
     }
@@ -178,7 +195,7 @@ mod tests {
         let cost = forge_cost(Quality::Standard).expect("standard should be forgeable");
         let available = Gold::new(cost.amount() + 500);
 
-        let outcome = forge(Quality::Standard, 4, available).expect("forge should succeed");
+        let outcome = forge(swords(Quality::Standard, 4), available).expect("forge should succeed");
 
         assert_eq!(outcome.gold_spent(), cost);
         assert_eq!(outcome.gold_remaining(), Gold::new(500));
