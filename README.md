@@ -76,14 +76,20 @@ Both systems support progression beyond level 100.
 
 ## Quality
 
-Quality-bearing item categories use a long-tail quality system ranging from
-Standard to Primordial. Quality can be obtained through natural quality rolls
-or deterministically through the Forge for eligible items.
+Only the Crafted Items category supports the long-tail quality system ranging
+from Standard to Primordial. Quality can be obtained through natural quality
+rolls or deterministically through the Forge for eligible items. Eligibility
+belongs to the item category, so a Crafted Item can also have
+quality when dropped by a mob.
 
-Raw gathered resources have no quality. Their `ItemStack` contains only item
-identity and a positive quantity; Mining produces these stacks alongside XP.
-The concrete model for quality-bearing equipment and crafted items will be
-defined when the first such category is implemented.
+Raw gathered resources, refined materials such as planks and smelted materials,
+and cooked items have no quality. Being produced by a crafting skill does not
+automatically make an item quality-bearing. The universal `ItemStack` contains
+only item identity and a positive quantity; Mining produces these stacks
+alongside XP.
+`ItemKind::CraftedItem(CraftedItem::IronSword)` is the first concrete Crafted
+Item identity. Storage and rolling of its quality remain a future step;
+`ItemStack` itself has no quality field.
 
 See [Quality and Forging](docs/quality-and-forging.md).
 

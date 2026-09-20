@@ -1,12 +1,46 @@
 # Quality and Forging
 
+## Quality Eligibility
+
+**Locked design:** Only Crafted Items can have Quality. Crafted Items, Refined
+Materials, and Cooked Items are distinct domain categories; "crafted" is not a
+synonym for everything produced by a crafting skill.
+
+```text
+Items
+|-- Raw Resources       (Iron Ore, Logs, Raw Fish)
+|-- Refined Materials   (Iron Ingot, Planks, Leather)
+|-- Cooked Items        (Cooked Food)
+`-- Crafted Items       (Iron Sword, Axe, Bow, Armor)
+```
+
+This taxonomy describes design categories; the examples are not all implemented.
+
+The following have no quality:
+
+- raw gathered resources
+- refined materials such as planks
+- smelted materials
+- cooked items
+
+Eligibility is a property of the item category, not its source. A mob drop can
+have quality only if it belongs to the Crafted Items category. A mob
+dropping resources, refined materials, or cooked items does not give those
+items quality.
+
+**Current implementation:** `ItemKind` has `Resource(Resource)` and
+`CraftedItem(CraftedItem)` variants. `CraftedItem::IronSword` is the first crafted
+identity, and `ItemKind::supports_quality()` is true only for `CraftedItem`.
+Refined Material and Cooked Item types will be introduced with their concrete
+content. This eligibility check does not attach quality to the universal stack
+or integrate quality rolling into Smithing yet.
+
 ## Resource Quality
 
 **Locked design:** Raw gathered resources do not have item quality.
 
 Mining and other resource-gathering activities produce resource stacks with an
-item identity and quantity. Quality is reserved for item categories explicitly
-designed to support it.
+item identity and quantity. Quality is reserved for the Crafted Items category.
 
 For example:
 
@@ -93,8 +127,8 @@ specialization, and the quality-roll operation.
 Raw resources are not forgeable merely because they can be represented as an
 `ItemStack`.
 
-The concrete model for quality-bearing equipment and crafted items will be
-defined when the first such item category is implemented.
+The representation of quality for `CraftedItem::IronSword` remains to be
+designed. Its category establishes eligibility, not a stored quality value.
 
 ## Forge
 

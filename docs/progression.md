@@ -77,10 +77,11 @@ economy.
 `10,000` represents `1.00x`, and specialization increases it with diminishing
 growth.
 
-**Locked design:** Quality luck is relevant only to quality-bearing item
-categories. Raw gathered resources have no quality; resource specialization
-does not introduce quality rolls into Mining. Forge is a separate deterministic
-economic mechanic and does not use specialization luck.
+**Locked design:** Quality luck is relevant only to the Crafted Items category.
+Raw gathered resources, refined and smelted materials, and cooked
+items have no quality; specialization does not introduce quality rolls into
+their production. Forge is a separate deterministic economic mechanic and does
+not use specialization luck.
 
 **Balance placeholder:** The current coefficient and progression behavior need
 simulation and balancing. Infinite specialization must not make the highest
