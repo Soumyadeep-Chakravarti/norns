@@ -3,4 +3,5 @@ pub enum Resource {
     Stone,
     CopperOre,
     TinOre,
+    IronOre,
 }

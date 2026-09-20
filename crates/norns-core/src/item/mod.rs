@@ -1,3 +1,4 @@
+mod crafted;
 mod forge;
 mod kind;
 mod quality;
@@ -5,6 +6,7 @@ mod quality_roll;
 mod resource;
 mod stack;
 
+pub use crafted::CraftedItem;
 pub use forge::{FORGE_ITEM_COST, ForgeError, ForgeOutcome, forge, forge_cost};
 pub use kind::ItemKind;
 pub use quality::Quality;

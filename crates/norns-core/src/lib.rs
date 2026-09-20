@@ -1,3 +1,4 @@
+pub mod crafting;
 pub mod economy;
 pub mod gathering;
 pub mod item;
