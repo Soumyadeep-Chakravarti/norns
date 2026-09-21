@@ -182,7 +182,7 @@ mod tests {
     #[test]
     fn tiers_increase_through_the_ladder() {
         for (tier, quality) in QUALITY_LADDER.iter().enumerate() {
-            assert_eq!(quality.tier(), tier as u32);
+            assert_eq!(quality.tier(), u32::try_from(tier).unwrap());
         }
     }
 
