@@ -46,14 +46,19 @@ impl CraftedItemStack {
 #[cfg(test)]
 mod tests {
     use super::{CraftedItem, CraftedItemStack, Quality};
+    use crate::item::MaterialTier;
 
     #[test]
     fn positive_quantities_preserve_identity_and_quality() {
         for quantity in [1, 4, u32::MAX] {
-            let stack = CraftedItemStack::new(CraftedItem::IronSword, Quality::Rare, quantity)
-                .expect("positive quantity should create a stack");
+            let stack = CraftedItemStack::new(
+                CraftedItem::Sword(MaterialTier::Iron),
+                Quality::Rare,
+                quantity,
+            )
+            .expect("positive quantity should create a stack");
 
-            assert_eq!(stack.item(), CraftedItem::IronSword);
+            assert_eq!(stack.item(), CraftedItem::Sword(MaterialTier::Iron));
             assert_eq!(stack.quality(), Quality::Rare);
             assert_eq!(stack.quantity(), quantity);
         }
@@ -62,16 +67,16 @@ mod tests {
     #[test]
     fn zero_quantity_is_rejected() {
         assert_eq!(
-            CraftedItemStack::new(CraftedItem::IronSword, Quality::Rare, 0),
+            CraftedItemStack::new(CraftedItem::Sword(MaterialTier::Iron), Quality::Rare, 0),
             None
         );
     }
 
     #[test]
     fn different_qualities_are_unequal() {
-        let rare = CraftedItemStack::new(CraftedItem::IronSword, Quality::Rare, 4)
+        let rare = CraftedItemStack::new(CraftedItem::Sword(MaterialTier::Iron), Quality::Rare, 4)
             .expect("positive quantity should create a stack");
-        let epic = CraftedItemStack::new(CraftedItem::IronSword, Quality::Epic, 4)
+        let epic = CraftedItemStack::new(CraftedItem::Sword(MaterialTier::Iron), Quality::Epic, 4)
             .expect("positive quantity should create a stack");
 
         assert_ne!(rare, epic);
@@ -79,8 +84,9 @@ mod tests {
 
     #[test]
     fn standard_is_an_explicit_resolved_quality() {
-        let stack = CraftedItemStack::new(CraftedItem::IronSword, Quality::Standard, 1)
-            .expect("positive quantity should create a stack");
+        let stack =
+            CraftedItemStack::new(CraftedItem::Sword(MaterialTier::Iron), Quality::Standard, 1)
+                .expect("positive quantity should create a stack");
 
         assert_eq!(stack.quality(), Quality::Standard);
     }

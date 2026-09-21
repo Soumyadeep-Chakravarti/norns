@@ -120,10 +120,10 @@ mod tests {
     use crate::economy::Gold;
 
     use super::{FORGE_ITEM_COST, ForgeError, forge, forge_cost};
-    use crate::item::{CraftedItem, CraftedItemStack, Quality};
+    use crate::item::{CraftedItem, CraftedItemStack, MaterialTier, Quality};
 
     fn swords(quality: Quality, quantity: u32) -> CraftedItemStack {
-        CraftedItemStack::new(CraftedItem::IronSword, quality, quantity)
+        CraftedItemStack::new(CraftedItem::Sword(MaterialTier::Iron), quality, quantity)
             .expect("positive quantity should create a stack")
     }
 
@@ -141,7 +141,10 @@ mod tests {
             forge(swords(Quality::Rare, 7), Gold::new(1_000_000)).expect("forge should succeed");
 
         assert_eq!(outcome.consumed_items(), 4);
-        assert_eq!(outcome.produced().item(), CraftedItem::IronSword);
+        assert_eq!(
+            outcome.produced().item(),
+            CraftedItem::Sword(MaterialTier::Iron)
+        );
         assert_eq!(outcome.produced().quality(), Quality::Epic);
         assert_eq!(outcome.produced().quantity(), 1);
     }
