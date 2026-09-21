@@ -1,30 +1,37 @@
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
+/// The authoritative in-game gold balance.
 pub struct Gold(u64);
 
 impl Gold {
+    /// A zero balance.
     pub const ZERO: Self = Self(0);
 
     #[must_use]
+    /// Creates a balance from an amount of gold.
     pub const fn new(amount: u64) -> Self {
         Self(amount)
     }
 
     #[must_use]
+    /// Returns the raw gold amount.
     pub const fn amount(self) -> u64 {
         self.0
     }
 
     #[must_use]
+    /// Returns whether this balance covers `cost`.
     pub const fn can_afford(self, cost: Self) -> bool {
         self.0 >= cost.0
     }
 
     #[must_use]
+    /// Adds gold without allowing integer overflow.
     pub const fn saturating_add(self, other: Self) -> Self {
         Self(self.0.saturating_add(other.0))
     }
 
     #[must_use]
+    /// Subtracts gold, returning `None` when the balance is insufficient.
     pub const fn checked_sub(self, other: Self) -> Option<Self> {
         match self.0.checked_sub(other.0) {
             Some(amount) => Some(Self(amount)),

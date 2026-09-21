@@ -123,6 +123,9 @@ rendering, and asynchronous runtime concerns.
 
 See [Architecture](docs/architecture.md).
 
+See [Core API Guide](docs/api.md) for domain invariants, deterministic activity
+flow, item categories, and transaction semantics.
+
 ## Technology
 
 - Rust

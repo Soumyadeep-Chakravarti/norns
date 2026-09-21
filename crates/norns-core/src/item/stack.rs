@@ -1,6 +1,7 @@
 use super::ItemKind;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// An unresolved item identity and positive quantity.
 pub struct ItemStack {
     kind: ItemKind,
     quantity: u32,
@@ -8,6 +9,7 @@ pub struct ItemStack {
 
 impl ItemStack {
     #[must_use]
+    /// Creates a stack, returning `None` for zero quantity.
     pub const fn new(kind: ItemKind, quantity: u32) -> Option<Self> {
         if quantity == 0 {
             None
@@ -17,11 +19,13 @@ impl ItemStack {
     }
 
     #[must_use]
+    /// Returns the item identity.
     pub const fn kind(self) -> ItemKind {
         self.kind
     }
 
     #[must_use]
+    /// Returns the number of items in the stack.
     pub const fn quantity(self) -> u32 {
         self.quantity
     }

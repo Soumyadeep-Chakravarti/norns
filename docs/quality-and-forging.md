@@ -33,6 +33,10 @@ items quality.
 Crafted equipment combines an equipment identity with a `MaterialTier`. All
 `CraftedItem`s support quality; everything else does not.
 
+Equipment metadata now separates material tier, equipment slot, combat family,
+and provisional base stats. Quality resolution and character modifiers remain
+separate from those base stats.
+
 The current material model has 18 tiers and the quality model has 22 tiers.
 Together they provide 396 material-quality combinations per equipment identity
 without defining each combination as a separate item variant.

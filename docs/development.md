@@ -93,3 +93,18 @@ forge costs, and content level requirements.
 
 A future simulation environment can evaluate progression rates, resource
 are treated as stable.
+## Strict Checks
+
+The workspace treats compiler warnings, missing documentation, broken rustdoc
+links, all Clippy lints, and Clippy's pedantic lints as errors. Run the full
+local gate before submitting changes:
+
+```bash
+cargo fmt --all -- --check
+cargo rustdoc -p norns-core --lib -- -D missing_docs -D rustdoc::broken_intra_doc_links -D rustdoc::bare_urls
+cargo clippy --workspace --all-targets --all-features -- -D warnings
+cargo test --workspace --all-features
+cargo check --workspace --all-targets --all-features --locked
+```
+
+The same checks run in `.github/workflows/strict.yml`.

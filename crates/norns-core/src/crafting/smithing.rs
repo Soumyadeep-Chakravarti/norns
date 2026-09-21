@@ -7,6 +7,7 @@ use crate::{
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Deterministic recipe for producing a quality-bearing crafted item.
 pub struct SmithingRecipe {
     input: ItemStack,
     output: ItemStack,
@@ -17,11 +18,13 @@ pub struct SmithingRecipe {
 
 impl SmithingRecipe {
     #[must_use]
+    /// Creates a sword recipe for a material tier.
     pub const fn sword_for_tier(tier: MaterialTier) -> Self {
         Self::for_item(tier, CraftedItem::Sword(tier), 2)
     }
 
     #[must_use]
+    /// Creates an axe recipe for a material tier.
     pub const fn axe_for_tier(tier: MaterialTier) -> Self {
         Self::for_item(tier, CraftedItem::Axe(tier), 3)
     }
@@ -48,16 +51,19 @@ impl SmithingRecipe {
     }
 
     #[must_use]
+    /// Returns the ingot input stack.
     pub const fn input(self) -> ItemStack {
         self.input
     }
 
     #[must_use]
+    /// Returns the unresolved crafted output stack.
     pub const fn output(self) -> ItemStack {
         self.output
     }
 
     #[must_use]
+    /// Returns the required Smithing level.
     pub const fn required_level(self) -> SkillLevel {
         self.required_level
     }
@@ -89,6 +95,7 @@ pub const IRON_SWORD: SmithingRecipe = {
     }
 };
 
+/// Provisional copper sword recipe.
 pub const COPPER_SWORD: SmithingRecipe = {
     let Some(input) = ItemStack::new(
         ItemKind::RefinedMaterial(RefinedMaterial::Ingot(MaterialTier::Copper)),
@@ -112,6 +119,7 @@ pub const COPPER_SWORD: SmithingRecipe = {
     }
 };
 
+/// Provisional tin sword recipe.
 pub const TIN_SWORD: SmithingRecipe = {
     let Some(input) = ItemStack::new(
         ItemKind::RefinedMaterial(RefinedMaterial::Ingot(MaterialTier::Tin)),
@@ -135,6 +143,7 @@ pub const TIN_SWORD: SmithingRecipe = {
     }
 };
 
+/// Provisional copper axe recipe.
 pub const COPPER_AXE: SmithingRecipe = {
     let Some(input) = ItemStack::new(
         ItemKind::RefinedMaterial(RefinedMaterial::Ingot(MaterialTier::Copper)),
@@ -158,6 +167,7 @@ pub const COPPER_AXE: SmithingRecipe = {
     }
 };
 
+/// Provisional tin axe recipe.
 pub const TIN_AXE: SmithingRecipe = {
     let Some(input) = ItemStack::new(
         ItemKind::RefinedMaterial(RefinedMaterial::Ingot(MaterialTier::Tin)),
@@ -181,6 +191,7 @@ pub const TIN_AXE: SmithingRecipe = {
     }
 };
 
+/// Provisional iron axe recipe.
 pub const IRON_AXE: SmithingRecipe = {
     let Some(input) = ItemStack::new(
         ItemKind::RefinedMaterial(RefinedMaterial::Ingot(MaterialTier::Iron)),
@@ -206,6 +217,7 @@ pub const IRON_AXE: SmithingRecipe = {
 
 /// Describes one completed craft; applying costs and rewards is the caller's job.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Result of one completed Smithing activity.
 pub struct SmithingOutcome {
     consumed: ItemStack,
     produced: CraftedItemStack,
@@ -215,21 +227,25 @@ pub struct SmithingOutcome {
 
 impl SmithingOutcome {
     #[must_use]
+    /// Returns the consumed ingot stack.
     pub const fn consumed(self) -> ItemStack {
         self.consumed
     }
 
     #[must_use]
+    /// Returns the quality-resolved crafted output.
     pub const fn produced(self) -> CraftedItemStack {
         self.produced
     }
 
     #[must_use]
+    /// Returns broad Smithing XP.
     pub const fn smithing_xp(self) -> Experience {
         self.smithing_xp
     }
 
     #[must_use]
+    /// Returns Smithing specialization XP.
     pub const fn specialization_xp(self) -> Experience {
         self.specialization_xp
     }

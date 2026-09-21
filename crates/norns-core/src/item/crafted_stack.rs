@@ -28,16 +28,19 @@ impl CraftedItemStack {
     }
 
     #[must_use]
+    /// Returns the crafted identity.
     pub const fn item(self) -> CraftedItem {
         self.item
     }
 
     #[must_use]
+    /// Returns the explicitly resolved quality.
     pub const fn quality(self) -> Quality {
         self.quality
     }
 
     #[must_use]
+    /// Returns the number of crafted items in the stack.
     pub const fn quantity(self) -> u32 {
         self.quantity
     }

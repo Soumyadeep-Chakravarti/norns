@@ -4,6 +4,7 @@ use crate::{
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Deterministic recipe for converting ore into an ingot.
 pub struct SmeltingRecipe {
     input: ItemStack,
     output: ItemStack,
@@ -14,6 +15,7 @@ pub struct SmeltingRecipe {
 
 impl SmeltingRecipe {
     #[must_use]
+    /// Creates the provisional recipe for a material tier.
     pub const fn for_tier(tier: MaterialTier) -> Self {
         let tier_number = tier.tier() as u32;
         let Some(input) = ItemStack::new(ItemKind::Resource(Resource::TieredOre(tier)), 2) else {
@@ -35,16 +37,19 @@ impl SmeltingRecipe {
     }
 
     #[must_use]
+    /// Returns the ore input stack.
     pub const fn input(self) -> ItemStack {
         self.input
     }
 
     #[must_use]
+    /// Returns the ingot output stack.
     pub const fn output(self) -> ItemStack {
         self.output
     }
 
     #[must_use]
+    /// Returns the required Smithing level.
     pub const fn required_level(self) -> SkillLevel {
         self.required_level
     }
@@ -71,6 +76,7 @@ pub const IRON_INGOT: SmeltingRecipe = {
     }
 };
 
+/// Provisional copper ore smelting recipe.
 pub const COPPER_INGOT: SmeltingRecipe = {
     let Some(input) = ItemStack::new(ItemKind::Resource(Resource::CopperOre), 2) else {
         unreachable!()
@@ -91,6 +97,7 @@ pub const COPPER_INGOT: SmeltingRecipe = {
     }
 };
 
+/// Provisional tin ore smelting recipe.
 pub const TIN_INGOT: SmeltingRecipe = {
     let Some(input) = ItemStack::new(ItemKind::Resource(Resource::TinOre), 2) else {
         unreachable!()
@@ -112,6 +119,7 @@ pub const TIN_INGOT: SmeltingRecipe = {
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Result of one completed smelting activity.
 pub struct SmeltingOutcome {
     consumed: ItemStack,
     produced: ItemStack,
@@ -121,27 +129,32 @@ pub struct SmeltingOutcome {
 
 impl SmeltingOutcome {
     #[must_use]
+    /// Returns the consumed ore stack.
     pub const fn consumed(self) -> ItemStack {
         self.consumed
     }
 
     #[must_use]
+    /// Returns the produced ingot stack.
     pub const fn produced(self) -> ItemStack {
         self.produced
     }
 
     #[must_use]
+    /// Returns broad Smithing XP.
     pub const fn smithing_xp(self) -> Experience {
         self.smithing_xp
     }
 
     #[must_use]
+    /// Returns Smithing specialization XP.
     pub const fn specialization_xp(self) -> Experience {
         self.specialization_xp
     }
 }
 
 #[must_use]
+/// Checks the Smithing level requirement for a smelting recipe.
 pub const fn can_smelt(recipe: SmeltingRecipe, smithing_level: SkillLevel) -> bool {
     smithing_level >= recipe.required_level
 }

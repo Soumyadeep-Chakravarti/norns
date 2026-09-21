@@ -2,14 +2,18 @@ use crate::progression::SkillLevel;
 
 use super::Quality;
 
+/// Exclusive upper bound for server-supplied quality rolls.
 pub const QUALITY_ROLL_RANGE: u64 = 2_000_000;
+/// Basis-point multiplier representing 1.00x quality luck.
 pub const BASE_LUCK_BASIS_POINTS: u64 = 10_000;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// A validated deterministic quality-roll input.
 pub struct QualityRoll(u64);
 
 impl QualityRoll {
     #[must_use]
+    /// Creates a roll when `value` is inside [`QUALITY_ROLL_RANGE`].
     pub const fn new(value: u64) -> Option<Self> {
         if value < QUALITY_ROLL_RANGE {
             Some(Self(value))
@@ -19,6 +23,7 @@ impl QualityRoll {
     }
 
     #[must_use]
+    /// Returns the raw roll value.
     pub const fn value(self) -> u64 {
         self.0
     }
@@ -46,6 +51,7 @@ pub fn specialization_luck(level: SkillLevel) -> u64 {
 }
 
 #[must_use]
+/// Resolves a quality from a roll and specialization level.
 pub fn roll_quality(roll: QualityRoll, specialization_level: SkillLevel) -> Quality {
     let luck = specialization_luck(specialization_level);
 

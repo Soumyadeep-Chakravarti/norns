@@ -1,27 +1,47 @@
 /// Material tiers shared by refined metal and metal equipment.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+/// Norse/Valheim-inspired material progression tier.
 pub enum MaterialTier {
+    /// Early copper tier.
     Copper,
+    /// Early tin tier.
     Tin,
+    /// Copper-and-tin alloy tier.
     Bronze,
+    /// Iron tier.
     Iron,
+    /// Refined steel tier.
     Steel,
+    /// Precious silver tier.
     Silver,
+    /// Blackmetal tier.
     Blackmetal,
+    /// Volcanic obsidian tier.
     Obsidian,
+    /// Ancient root tier.
     Root,
+    /// Fenris-themed tier.
     Fenris,
+    /// Carapace tier.
     Carapace,
+    /// Eitr-infused tier.
     Eitr,
+    /// Dvergr-forged tier.
     Dvergr,
+    /// Jotunn tier.
     Jotunn,
+    /// Aesir tier.
     Aesir,
+    /// Bifrost tier.
     Bifrost,
+    /// Yggdrasil tier.
     Yggdrasil,
+    /// Final Norn tier.
     Norn,
 }
 
 impl MaterialTier {
+    /// All material tiers in progression order.
     pub const ALL: [Self; 18] = [
         Self::Copper,
         Self::Tin,
@@ -44,6 +64,7 @@ impl MaterialTier {
     ];
 
     #[must_use]
+    /// Returns the one-based numeric tier.
     pub const fn tier(self) -> u8 {
         match self {
             Self::Copper => 1,

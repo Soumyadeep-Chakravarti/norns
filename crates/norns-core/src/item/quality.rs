@@ -1,31 +1,55 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+/// Quality tier applied only to eligible crafted items.
 pub enum Quality {
+    /// Guaranteed baseline quality.
     Standard,
+    /// Common quality.
     Common,
+    /// Uncommon quality.
     Uncommon,
+    /// Rare quality.
     Rare,
+    /// Epic quality.
     Epic,
+    /// Legendary quality.
     Legendary,
+    /// Mythic quality.
     Mythic,
+    /// Ancient quality.
     Ancient,
+    /// Relic quality.
     Relic,
+    /// Runebound quality.
     Runebound,
+    /// Cursed quality.
     Cursed,
+    /// Eldritch quality.
     Eldritch,
+    /// Forgotten quality.
     Forgotten,
+    /// Fatebound quality.
     Fatebound,
+    /// Hel-Forged quality.
     HelForged,
+    /// Jötunnforged quality.
     Jotunnforged,
+    /// Voidborn quality.
     Voidborn,
+    /// Einherjar quality.
     Einherjar,
+    /// Æsir-Touched quality.
     AesirTouched,
+    /// Worldforged quality.
     Worldforged,
+    /// Norn-Touched quality.
     NornTouched,
+    /// Final quality tier.
     Primordial,
 }
 
 impl Quality {
     #[must_use]
+    /// Returns the zero-based quality tier.
     pub const fn tier(self) -> u32 {
         match self {
             Self::Standard => 0,
@@ -54,6 +78,7 @@ impl Quality {
     }
 
     #[must_use]
+    /// Returns the base rarity denominator used by quality rolling.
     pub const fn base_rarity(self) -> u64 {
         match self {
             Self::Standard => 1,
@@ -82,6 +107,7 @@ impl Quality {
     }
 
     #[must_use]
+    /// Returns the next quality, or `None` for `Primordial`.
     pub const fn next(self) -> Option<Self> {
         match self {
             Self::Standard => Some(Self::Common),
@@ -110,6 +136,7 @@ impl Quality {
     }
 
     #[must_use]
+    /// Returns the display name, including Norse spelling.
     pub const fn name(self) -> &'static str {
         match self {
             Self::Standard => "Standard",

@@ -1,10 +1,13 @@
+/// Accumulated experience, saturating at `u64::MAX`.
 pub type Experience = u64;
+/// A non-negative skill level.
 pub type SkillLevel = u32;
 
 const QUADRATIC_SCALE: Experience = 100;
 const CUBIC_SCALE: Experience = 5;
 
 #[must_use]
+/// Returns the cumulative XP threshold for a level.
 pub fn xp_for_level(level: SkillLevel) -> Experience {
     if level <= 1 {
         return 0;
@@ -21,6 +24,7 @@ pub fn xp_for_level(level: SkillLevel) -> Experience {
 }
 
 #[must_use]
+/// Converts cumulative XP to the highest reached level.
 pub fn level_from_xp(xp: Experience) -> SkillLevel {
     let mut low: SkillLevel = 1;
     let mut high: SkillLevel = 2;

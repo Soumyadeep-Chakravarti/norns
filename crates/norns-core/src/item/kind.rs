@@ -1,9 +1,13 @@
 use super::{CraftedItem, RefinedMaterial, Resource};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+/// Identity category for an item stack.
 pub enum ItemKind {
+    /// An unrefined gathered resource.
     Resource(Resource),
+    /// A refined material without quality.
     RefinedMaterial(RefinedMaterial),
+    /// A quality-eligible crafted identity.
     CraftedItem(CraftedItem),
 }
 

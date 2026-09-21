@@ -2,12 +2,14 @@ use crate::economy::Gold;
 
 use super::{CraftedItemStack, Quality};
 
+/// Number of identical items consumed by one Forge upgrade.
 pub const FORGE_ITEM_COST: u32 = 4;
 
 const BASE_FORGE_COST: u64 = 100;
 const FORGE_COST_MULTIPLIER: u64 = 2;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Result of a successful deterministic Forge upgrade.
 pub struct ForgeOutcome {
     consumed_items: u32,
     produced: CraftedItemStack,
@@ -17,34 +19,53 @@ pub struct ForgeOutcome {
 
 impl ForgeOutcome {
     #[must_use]
+    /// Returns the number of input items consumed.
     pub const fn consumed_items(self) -> u32 {
         self.consumed_items
     }
 
     #[must_use]
+    /// Returns the upgraded crafted item.
     pub const fn produced(self) -> CraftedItemStack {
         self.produced
     }
 
     #[must_use]
+    /// Returns the Forge fee.
     pub const fn gold_spent(self) -> Gold {
         self.gold_spent
     }
 
     #[must_use]
+    /// Returns gold remaining after the fee.
     pub const fn gold_remaining(self) -> Gold {
         self.gold_remaining
     }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Failure reasons for a Forge operation.
 pub enum ForgeError {
+    /// The input is already at the final quality.
     FinalQuality,
-    InsufficientItems { required: u32, available: u32 },
-    InsufficientGold { required: Gold, available: Gold },
+    /// Fewer than four matching items were supplied.
+    InsufficientItems {
+        /// Number of items required by the Forge.
+        required: u32,
+        /// Number of items supplied by the input stack.
+        available: u32,
+    },
+    /// The available gold did not cover the fee.
+    InsufficientGold {
+        /// Gold required by the Forge.
+        required: Gold,
+        /// Gold supplied by the player.
+        available: Gold,
+    },
 }
 
 #[must_use]
+/// Returns the gold cost to advance one quality tier.
 pub const fn forge_cost(quality: Quality) -> Option<Gold> {
     let Some(next_quality) = quality.next() else {
         return None;

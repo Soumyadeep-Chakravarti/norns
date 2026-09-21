@@ -4,6 +4,7 @@ use crate::{
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Configuration for one repeatable Mining activity.
 pub struct MiningNode {
     resource: Resource,
     required_level: SkillLevel,
@@ -14,6 +15,7 @@ pub struct MiningNode {
 
 impl MiningNode {
     #[must_use]
+    /// Creates the provisional node configuration for a material tier.
     pub const fn for_tier(tier: MaterialTier) -> Self {
         let tier_number = tier.tier() as u32;
 
@@ -27,32 +29,38 @@ impl MiningNode {
     }
 
     #[must_use]
+    /// Returns the resource produced by the node.
     pub const fn resource(self) -> Resource {
         self.resource
     }
 
     #[must_use]
+    /// Returns the required Mining level.
     pub const fn required_level(self) -> SkillLevel {
         self.required_level
     }
 
     #[must_use]
+    /// Returns the provisional activity duration in seconds.
     pub const fn cycle_seconds(self) -> u32 {
         self.cycle_seconds
     }
 
     #[must_use]
+    /// Returns broad Mining XP per cycle.
     pub const fn xp_per_cycle(self) -> Experience {
         self.xp_per_cycle
     }
 
     #[must_use]
+    /// Returns resource specialization XP per cycle.
     pub const fn specialization_xp_per_cycle(self) -> Experience {
         self.specialization_xp_per_cycle
     }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Result of one completed Mining cycle.
 pub struct MiningOutcome {
     stack: ItemStack,
     mining_xp: Experience,
@@ -61,21 +69,25 @@ pub struct MiningOutcome {
 
 impl MiningOutcome {
     #[must_use]
+    /// Returns the gathered resource stack.
     pub const fn stack(self) -> ItemStack {
         self.stack
     }
 
     #[must_use]
+    /// Returns broad Mining XP.
     pub const fn mining_xp(self) -> Experience {
         self.mining_xp
     }
 
     #[must_use]
+    /// Returns resource specialization XP.
     pub const fn specialization_xp(self) -> Experience {
         self.specialization_xp
     }
 }
 
+/// Provisional Stone node.
 pub const STONE: MiningNode = MiningNode {
     resource: Resource::Stone,
     required_level: 1,
@@ -84,6 +96,7 @@ pub const STONE: MiningNode = MiningNode {
     specialization_xp_per_cycle: 10,
 };
 
+/// Provisional Copper Ore node.
 pub const COPPER: MiningNode = MiningNode {
     resource: Resource::CopperOre,
     required_level: 5,
@@ -92,6 +105,7 @@ pub const COPPER: MiningNode = MiningNode {
     specialization_xp_per_cycle: 20,
 };
 
+/// Provisional Tin Ore node.
 pub const TIN: MiningNode = MiningNode {
     resource: Resource::TinOre,
     required_level: 10,
@@ -100,6 +114,7 @@ pub const TIN: MiningNode = MiningNode {
     specialization_xp_per_cycle: 30,
 };
 
+/// Provisional Iron Ore node.
 pub const IRON: MiningNode = MiningNode {
     resource: Resource::IronOre,
     required_level: 15,
@@ -109,11 +124,13 @@ pub const IRON: MiningNode = MiningNode {
 };
 
 #[must_use]
+/// Checks the Mining level requirement for a node.
 pub const fn can_mine(node: MiningNode, mining_level: SkillLevel) -> bool {
     mining_level >= node.required_level
 }
 
 #[must_use]
+/// Resolves one Mining cycle without mutating player state.
 pub const fn mine(node: MiningNode) -> MiningOutcome {
     let Some(stack) = ItemStack::new(ItemKind::Resource(node.resource), 1) else {
         unreachable!()
