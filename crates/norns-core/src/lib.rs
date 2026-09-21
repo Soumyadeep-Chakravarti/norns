@@ -11,6 +11,8 @@
 //! rolls so the same inputs always produce the same result.
 #![deny(missing_docs)]
 
+/// Deterministic combat definitions and round resolution.
+pub mod combat;
 /// Crafting recipes and production outcomes.
 pub mod crafting;
 /// Currency and economy primitives.

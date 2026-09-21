@@ -76,6 +76,16 @@ between inventory and `EquipmentLoadout`. Equipping removes one item, places it
 in the loadout, and returns the replaced item to inventory. Unequipping moves
 the equipped item back to inventory.
 
+## Combat Resolution
+
+Combat uses `CombatantStats`, `EnemyDefinition`, `CombatState`, and
+`resolve_round`. The resolver accepts a server-supplied `AttackInput`, applies
+the player attack, optionally applies the enemy attack, and returns a new
+`CombatState` plus rewards on victory. It does not measure time, loop rounds,
+generate randomness, or mutate inventory. The server/activity layer repeats
+rounds according to elapsed-time policy and applies `CombatReward` through its
+normal state transaction path.
+
 ## Balance Status
 
 Tier requirements, durations, XP, recipe quantities, equipment stats, Forge
