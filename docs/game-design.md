@@ -75,9 +75,11 @@ specialists and interacting with other specialists.
 ## Current Vertical Slice
 
 **Current implementation:** Mining is the first gathering vertical slice, with
-Stone, Copper Ore, and Tin Ore. Mining grants broad mining XP and resource
-specialization XP alongside an `ItemStack` containing resource identity and a
-positive quantity. Raw resources have no quality, and Mining does not roll it.
+Stone, Copper Ore, Tin Ore, and Iron Ore. Mining grants broad mining XP and
+resource specialization XP alongside an `ItemStack` containing resource
+identity and a positive quantity. Raw resources have no quality, and Mining
+does not roll it. Smithing now has a deterministic Iron Ore -> Iron Ingot
+smelting step followed by the Iron Ingot -> Iron Sword recipe.
 
 **Balance placeholder:** Node level requirements, cycle durations, and XP
 rewards are provisional.

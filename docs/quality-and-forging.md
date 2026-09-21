@@ -28,12 +28,30 @@ have quality only if it belongs to the Crafted Items category. A mob
 dropping resources, refined materials, or cooked items does not give those
 items quality.
 
-**Current implementation:** `ItemKind` has `Resource(Resource)` and
-`CraftedItem(CraftedItem)` variants. `CraftedItem::IronSword` is the first crafted
-identity, and `ItemKind::supports_quality()` is true only for `CraftedItem`.
+**Current implementation:** `ItemKind` has `Resource(Resource)`,
+`RefinedMaterial(RefinedMaterial)`, and `CraftedItem(CraftedItem)` variants.
+Crafted equipment combines an equipment identity with a `MaterialTier`. All
+`CraftedItem`s support quality; everything else does not.
+
+The current material model has 18 tiers and the quality model has 22 tiers.
+Together they provide 396 material-quality combinations per equipment identity
+without defining each combination as a separate item variant.
+`ItemKind::supports_quality()` encodes this rule.
 Refined Material and Cooked Item types will be introduced with their concrete
-content. This eligibility check does not attach quality to the universal stack
-or integrate quality rolling into Smithing yet.
+content.
+
+## Stack Representations
+
+**Current implementation:** `ItemStack` represents an `ItemKind` and a positive
+quantity. For a Crafted Item, it is an unresolved identity/count description,
+such as a recipe output, not an owned quality-resolved item. It does not imply
+Standard quality.
+
+`CraftedItemStack` represents a `CraftedItem`, an explicit `Quality`, and a
+positive quantity. It is the resolved representation for crafted-item rewards
+and holdings, regardless of acquisition source. Standard is an actual resolved
+tier, not a substitute for missing quality. There are no automatic conversions
+from `ItemStack` to `CraftedItemStack`.
 
 ## Resource Quality
 
@@ -102,6 +120,26 @@ and specialization level. This separation avoids an RNG dependency in the core.
 
 **Locked design:** The server will eventually generate the random roll.
 
+### Smithing Quality Resolution
+
+**Current implementation:** `SmithingRecipe::output()` describes the item
+identity and count as an `ItemStack`. `smith(recipe, quality_roll,
+specialization_level)` resolves quality deterministically using `roll_quality()`
+and returns a `SmithingOutcome` containing:
+
+- `consumed`: the input `ItemStack`
+- `produced`: the resolved `CraftedItemStack`
+- Smithing XP and specialization XP
+
+The activity layer supplies the roll and relevant specialization level,
+validates eligibility and available inputs, and applies costs and rewards.
+Smithing does not generate randomness or mutate player state.
+
+**Current implementation:** The Iron Sword recipe consumes two Iron Ingots.
+The smelting activity that produces Iron Ingots from Iron Ore is not implemented
+yet, so the complete Iron Ore → Iron Ingot → Iron Sword activity chain remains
+unfinished.
+
 ## Specialization Luck
 
 **Current implementation:** Luck is an integer multiplier in basis points:
@@ -127,15 +165,26 @@ specialization, and the quality-roll operation.
 Raw resources are not forgeable merely because they can be represented as an
 `ItemStack`.
 
-The representation of quality for `CraftedItem::IronSword` remains to be
-designed. Its category establishes eligibility, not a stored quality value.
+**Current implementation:** Forge accepts only `CraftedItemStack`, so its input
+type restricts the operation to quality-resolved Crafted Items.
 
 ## Forge
 
-**Current implementation:** The core Forge calculation accepts a quality,
-available item count, and gold. It checks the count and fee, then reports the
-next quality and costs. It does not yet model item identity or enforce category
-eligibility.
+**Current implementation:** `forge(stack, available_gold)` accepts a
+`CraftedItemStack` and `Gold`. The stack supplies a single crafted-item identity,
+quality, and available quantity. Forge checks that the quality can be promoted,
+at least four items are available, and the gold covers the fee.
+
+On success, `ForgeOutcome` reports:
+
+- `consumed_items`: four
+- `produced`: one `CraftedItemStack` at the next quality, preserving the input's
+  `CraftedItem` identity
+- `gold_spent` and `gold_remaining`
+
+This describes a transaction. The inventory/activity layer subtracts four from
+the input stack, adds the promoted item, and applies the gold cost. Forge does
+not mutate inventory or return a remaining input stack.
 
 **Locked design:** Four identical eligible items of the same quality plus gold
 produce one of the same item at the next quality:
@@ -150,7 +199,7 @@ produce one of the same item at the next quality:
 at the next quality
 ```
 
-Illustrative future equipment example:
+Current Iron Sword example:
 
 ```text
 4 Rare Iron Swords
@@ -159,6 +208,10 @@ Illustrative future equipment example:
         v
 1 Epic Iron Sword
 ```
+
+If the input contains seven Rare Iron Swords, the outcome still reports four
+consumed and one Epic Iron Sword produced. Retaining the other three Rare
+swords is the inventory/activity layer's responsibility.
 
 Forging is guaranteed and does not use RNG. Primordial is final and cannot be
 forged further.

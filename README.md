@@ -87,11 +87,15 @@ and cooked items have no quality. Being produced by a crafting skill does not
 automatically make an item quality-bearing. The universal `ItemStack` contains
 only item identity and a positive quantity; Mining produces these stacks
 alongside XP.
-`ItemKind::CraftedItem(CraftedItem::IronSword)` is the first concrete Crafted
-Item identity. Storage and rolling of its quality remain a future step;
-`ItemStack` itself has no quality field.
+Crafted equipment combines a material tier, equipment identity, and quality.
+The current prototype includes eighteen material tiers in the data model, with
+quality resolved separately on `CraftedItemStack`; `ItemStack` itself has no
+quality field.
 
 See [Quality and Forging](docs/quality-and-forging.md).
+
+See [Minimum Content](docs/minimum-content.md) for the Realm Idle-derived
+content coverage and implementation order.
 
 ## Multiplayer
 
