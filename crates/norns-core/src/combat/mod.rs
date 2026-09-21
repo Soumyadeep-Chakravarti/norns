@@ -8,7 +8,10 @@ mod reward;
 mod state;
 mod stats;
 
-pub use activity::{CombatError, RoundOutcome, resolve_round};
+pub use activity::{
+    CombatActivityDefinition, CombatActivityError, CombatActivityOutcome, CombatActivityStop,
+    CombatError, RoundOutcome, resolve_activity, resolve_round,
+};
 pub use enemy::{EnemyDefinition, EnemyKind, GOBLIN_CHIEFTAIN};
 pub use input::AttackInput;
 pub use resolution::AttackResult;

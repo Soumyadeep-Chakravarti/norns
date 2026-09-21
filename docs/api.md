@@ -86,6 +86,12 @@ generate randomness, or mutate inventory. The server/activity layer repeats
 rounds according to elapsed-time policy and applies `CombatReward` through its
 normal state transaction path.
 
+`CombatActivityDefinition` and `resolve_activity` add elapsed-time orchestration
+without introducing a clock. The server supplies elapsed seconds and one
+critical-hit input per possible player attack. The resolver processes events in
+timestamp order, stops on death or time exhaustion, and reports attack counts
+and rewards.
+
 ## Balance Status
 
 Tier requirements, durations, XP, recipe quantities, equipment stats, Forge
