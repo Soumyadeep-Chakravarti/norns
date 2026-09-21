@@ -1,6 +1,7 @@
 use crate::{
     item::{
-        CraftedItem, CraftedItemStack, ItemKind, ItemStack, QualityRoll, Resource, roll_quality,
+        CraftedItem, CraftedItemStack, ItemKind, ItemStack, MaterialTier, QualityRoll,
+        RefinedMaterial, roll_quality,
     },
     progression::{Experience, SkillLevel},
 };
@@ -15,6 +16,37 @@ pub struct SmithingRecipe {
 }
 
 impl SmithingRecipe {
+    #[must_use]
+    pub const fn sword_for_tier(tier: MaterialTier) -> Self {
+        Self::for_item(tier, CraftedItem::Sword(tier), 2)
+    }
+
+    #[must_use]
+    pub const fn axe_for_tier(tier: MaterialTier) -> Self {
+        Self::for_item(tier, CraftedItem::Axe(tier), 3)
+    }
+
+    const fn for_item(tier: MaterialTier, item: CraftedItem, input_quantity: u32) -> Self {
+        let tier_number = tier.tier() as u32;
+        let Some(input) = ItemStack::new(
+            ItemKind::RefinedMaterial(RefinedMaterial::Ingot(tier)),
+            input_quantity,
+        ) else {
+            unreachable!()
+        };
+        let Some(output) = ItemStack::new(ItemKind::CraftedItem(item), 1) else {
+            unreachable!()
+        };
+
+        Self {
+            input,
+            output,
+            required_level: tier_number.saturating_mul(5),
+            smithing_xp: (tier_number as u64).saturating_mul(20),
+            specialization_xp: (tier_number as u64).saturating_mul(20),
+        }
+    }
+
     #[must_use]
     pub const fn input(self) -> ItemStack {
         self.input
@@ -31,15 +63,20 @@ impl SmithingRecipe {
     }
 }
 
-/// Provisional recipe: two Iron Ore become one Iron Sword.
+/// Provisional recipe: two Iron Ingots become one Iron Sword.
 ///
-/// Inputs, level requirement, and XP are development placeholders, including
-/// direct use of ore rather than a future smelting/intermediate-material loop.
+/// Inputs, level requirement, and XP remain development placeholders.
 pub const IRON_SWORD: SmithingRecipe = {
-    let Some(input) = ItemStack::new(ItemKind::Resource(Resource::IronOre), 2) else {
+    let Some(input) = ItemStack::new(
+        ItemKind::RefinedMaterial(RefinedMaterial::Ingot(MaterialTier::Iron)),
+        2,
+    ) else {
         unreachable!()
     };
-    let Some(output) = ItemStack::new(ItemKind::CraftedItem(CraftedItem::IronSword), 1) else {
+    let Some(output) = ItemStack::new(
+        ItemKind::CraftedItem(CraftedItem::Sword(MaterialTier::Iron)),
+        1,
+    ) else {
         unreachable!()
     };
 
@@ -49,6 +86,121 @@ pub const IRON_SWORD: SmithingRecipe = {
         required_level: 5,
         smithing_xp: 20,
         specialization_xp: 20,
+    }
+};
+
+pub const COPPER_SWORD: SmithingRecipe = {
+    let Some(input) = ItemStack::new(
+        ItemKind::RefinedMaterial(RefinedMaterial::Ingot(MaterialTier::Copper)),
+        2,
+    ) else {
+        unreachable!()
+    };
+    let Some(output) = ItemStack::new(
+        ItemKind::CraftedItem(CraftedItem::Sword(MaterialTier::Copper)),
+        1,
+    ) else {
+        unreachable!()
+    };
+
+    SmithingRecipe {
+        input,
+        output,
+        required_level: 1,
+        smithing_xp: 10,
+        specialization_xp: 10,
+    }
+};
+
+pub const TIN_SWORD: SmithingRecipe = {
+    let Some(input) = ItemStack::new(
+        ItemKind::RefinedMaterial(RefinedMaterial::Ingot(MaterialTier::Tin)),
+        2,
+    ) else {
+        unreachable!()
+    };
+    let Some(output) = ItemStack::new(
+        ItemKind::CraftedItem(CraftedItem::Sword(MaterialTier::Tin)),
+        1,
+    ) else {
+        unreachable!()
+    };
+
+    SmithingRecipe {
+        input,
+        output,
+        required_level: 3,
+        smithing_xp: 15,
+        specialization_xp: 15,
+    }
+};
+
+pub const COPPER_AXE: SmithingRecipe = {
+    let Some(input) = ItemStack::new(
+        ItemKind::RefinedMaterial(RefinedMaterial::Ingot(MaterialTier::Copper)),
+        3,
+    ) else {
+        unreachable!()
+    };
+    let Some(output) = ItemStack::new(
+        ItemKind::CraftedItem(CraftedItem::Axe(MaterialTier::Copper)),
+        1,
+    ) else {
+        unreachable!()
+    };
+
+    SmithingRecipe {
+        input,
+        output,
+        required_level: 2,
+        smithing_xp: 12,
+        specialization_xp: 12,
+    }
+};
+
+pub const TIN_AXE: SmithingRecipe = {
+    let Some(input) = ItemStack::new(
+        ItemKind::RefinedMaterial(RefinedMaterial::Ingot(MaterialTier::Tin)),
+        3,
+    ) else {
+        unreachable!()
+    };
+    let Some(output) = ItemStack::new(
+        ItemKind::CraftedItem(CraftedItem::Axe(MaterialTier::Tin)),
+        1,
+    ) else {
+        unreachable!()
+    };
+
+    SmithingRecipe {
+        input,
+        output,
+        required_level: 4,
+        smithing_xp: 18,
+        specialization_xp: 18,
+    }
+};
+
+pub const IRON_AXE: SmithingRecipe = {
+    let Some(input) = ItemStack::new(
+        ItemKind::RefinedMaterial(RefinedMaterial::Ingot(MaterialTier::Iron)),
+        3,
+    ) else {
+        unreachable!()
+    };
+    let Some(output) = ItemStack::new(
+        ItemKind::CraftedItem(CraftedItem::Axe(MaterialTier::Iron)),
+        1,
+    ) else {
+        unreachable!()
+    };
+
+    SmithingRecipe {
+        input,
+        output,
+        required_level: 6,
+        smithing_xp: 24,
+        specialization_xp: 24,
     }
 };
 
@@ -121,8 +273,59 @@ pub fn smith(
 
 #[cfg(test)]
 mod tests {
-    use super::{IRON_SWORD, can_smith, smith};
-    use crate::item::{CraftedItem, ItemKind, Quality, QualityRoll, Resource};
+    use super::{
+        COPPER_AXE, COPPER_SWORD, IRON_AXE, IRON_SWORD, SmithingRecipe, TIN_AXE, TIN_SWORD,
+        can_smith, smith,
+    };
+    use crate::item::{CraftedItem, ItemKind, MaterialTier, Quality, QualityRoll, RefinedMaterial};
+
+    #[test]
+    fn material_swords_use_their_matching_ingots() {
+        assert_eq!(
+            COPPER_SWORD.input().kind(),
+            ItemKind::RefinedMaterial(RefinedMaterial::Ingot(MaterialTier::Copper))
+        );
+        assert_eq!(
+            TIN_SWORD.input().kind(),
+            ItemKind::RefinedMaterial(RefinedMaterial::Ingot(MaterialTier::Tin))
+        );
+        assert_eq!(
+            COPPER_SWORD.output().kind(),
+            ItemKind::CraftedItem(CraftedItem::Sword(MaterialTier::Copper))
+        );
+        assert_eq!(
+            TIN_SWORD.output().kind(),
+            ItemKind::CraftedItem(CraftedItem::Sword(MaterialTier::Tin))
+        );
+    }
+
+    #[test]
+    fn material_axes_use_their_matching_ingots() {
+        assert_eq!(
+            COPPER_AXE.input().kind(),
+            ItemKind::RefinedMaterial(RefinedMaterial::Ingot(MaterialTier::Copper))
+        );
+        assert_eq!(
+            TIN_AXE.input().kind(),
+            ItemKind::RefinedMaterial(RefinedMaterial::Ingot(MaterialTier::Tin))
+        );
+        assert_eq!(
+            IRON_AXE.input().kind(),
+            ItemKind::RefinedMaterial(RefinedMaterial::Ingot(MaterialTier::Iron))
+        );
+        assert_eq!(
+            COPPER_AXE.output().kind(),
+            ItemKind::CraftedItem(CraftedItem::Axe(MaterialTier::Copper))
+        );
+        assert_eq!(
+            TIN_AXE.output().kind(),
+            ItemKind::CraftedItem(CraftedItem::Axe(MaterialTier::Tin))
+        );
+        assert_eq!(
+            IRON_AXE.output().kind(),
+            ItemKind::CraftedItem(CraftedItem::Axe(MaterialTier::Iron))
+        );
+    }
 
     #[test]
     fn iron_sword_requires_smithing_level() {
@@ -132,21 +335,24 @@ mod tests {
     }
 
     #[test]
-    fn iron_sword_craft_describes_resource_cost_and_rewards() {
+    fn iron_sword_craft_describes_refined_material_cost_and_rewards() {
         let roll = QualityRoll::new(1_800_000).expect("roll should be valid");
         let outcome = smith(IRON_SWORD, roll, 1);
 
         assert_eq!(outcome.consumed(), IRON_SWORD.input());
         assert_eq!(
             outcome.consumed().kind(),
-            ItemKind::Resource(Resource::IronOre)
+            ItemKind::RefinedMaterial(RefinedMaterial::Ingot(MaterialTier::Iron))
         );
         assert_eq!(outcome.consumed().quantity(), 2);
         assert_eq!(
             ItemKind::CraftedItem(outcome.produced().item()),
             IRON_SWORD.output().kind()
         );
-        assert_eq!(outcome.produced().item(), CraftedItem::IronSword);
+        assert_eq!(
+            outcome.produced().item(),
+            CraftedItem::Sword(MaterialTier::Iron)
+        );
         assert_eq!(outcome.produced().quality(), Quality::Rare);
         assert_eq!(
             outcome.produced().quantity(),
@@ -177,5 +383,28 @@ mod tests {
             specialized.specialization_xp(),
             baseline.specialization_xp()
         );
+    }
+
+    #[test]
+    fn every_material_tier_has_sword_and_axe_recipes() {
+        for tier in MaterialTier::ALL {
+            let sword = SmithingRecipe::sword_for_tier(tier);
+            let axe = SmithingRecipe::axe_for_tier(tier);
+
+            assert_eq!(
+                sword.input().kind(),
+                ItemKind::RefinedMaterial(RefinedMaterial::Ingot(tier))
+            );
+            assert_eq!(
+                sword.output().kind(),
+                ItemKind::CraftedItem(CraftedItem::Sword(tier))
+            );
+            assert_eq!(
+                axe.output().kind(),
+                ItemKind::CraftedItem(CraftedItem::Axe(tier))
+            );
+            assert_eq!(sword.output().quantity(), 1);
+            assert_eq!(axe.output().quantity(), 1);
+        }
     }
 }

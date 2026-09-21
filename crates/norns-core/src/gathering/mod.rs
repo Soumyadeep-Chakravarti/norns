@@ -1,3 +1,3 @@
 mod mining;
 
-pub use mining::{COPPER, MiningNode, MiningOutcome, STONE, TIN, can_mine, mine};
+pub use mining::{COPPER, IRON, MiningNode, MiningOutcome, STONE, TIN, can_mine, mine};

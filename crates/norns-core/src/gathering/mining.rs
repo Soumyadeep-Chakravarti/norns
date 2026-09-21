@@ -1,5 +1,5 @@
 use crate::{
-    item::{ItemKind, ItemStack, Resource},
+    item::{ItemKind, ItemStack, MaterialTier, Resource},
     progression::{Experience, SkillLevel},
 };
 
@@ -13,6 +13,19 @@ pub struct MiningNode {
 }
 
 impl MiningNode {
+    #[must_use]
+    pub const fn for_tier(tier: MaterialTier) -> Self {
+        let tier_number = tier.tier() as u32;
+
+        Self {
+            resource: Resource::TieredOre(tier),
+            required_level: tier_number.saturating_mul(5),
+            cycle_seconds: 3u32.saturating_add(tier_number.saturating_mul(2)),
+            xp_per_cycle: (tier_number as u64).saturating_mul(10),
+            specialization_xp_per_cycle: (tier_number as u64).saturating_mul(10),
+        }
+    }
+
     #[must_use]
     pub const fn resource(self) -> Resource {
         self.resource
@@ -87,6 +100,14 @@ pub const TIN: MiningNode = MiningNode {
     specialization_xp_per_cycle: 30,
 };
 
+pub const IRON: MiningNode = MiningNode {
+    resource: Resource::IronOre,
+    required_level: 15,
+    cycle_seconds: 8,
+    xp_per_cycle: 40,
+    specialization_xp_per_cycle: 40,
+};
+
 #[must_use]
 pub const fn can_mine(node: MiningNode, mining_level: SkillLevel) -> bool {
     mining_level >= node.required_level
@@ -107,9 +128,9 @@ pub const fn mine(node: MiningNode) -> MiningOutcome {
 
 #[cfg(test)]
 mod tests {
-    use crate::item::{ItemKind, Resource};
+    use crate::item::{ItemKind, MaterialTier, Resource};
 
-    use super::{COPPER, STONE, TIN, can_mine, mine};
+    use super::{COPPER, IRON, MiningNode, STONE, TIN, can_mine, mine};
 
     #[test]
     fn level_requirement_is_enforced() {
@@ -120,6 +141,9 @@ mod tests {
 
         assert!(!can_mine(TIN, 9));
         assert!(can_mine(TIN, 10));
+
+        assert!(!can_mine(IRON, 14));
+        assert!(can_mine(IRON, 15));
     }
 
     #[test]
@@ -134,5 +158,15 @@ mod tests {
             outcome.specialization_xp(),
             COPPER.specialization_xp_per_cycle()
         );
+    }
+
+    #[test]
+    fn every_material_tier_has_a_mining_node() {
+        for tier in MaterialTier::ALL {
+            let node = MiningNode::for_tier(tier);
+            assert_eq!(node.resource(), Resource::TieredOre(tier));
+            assert!(node.required_level() > 0);
+            assert!(node.xp_per_cycle() > 0);
+        }
     }
 }
